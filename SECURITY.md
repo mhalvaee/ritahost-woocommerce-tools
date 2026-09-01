@@ -14,4 +14,3 @@ Please do not disclose suspected vulnerabilities in public issues, discussions, 
 - a suggested remediation, if available.
 
 Do not include real customer data, credentials, or destructive proof-of-concept material.
-

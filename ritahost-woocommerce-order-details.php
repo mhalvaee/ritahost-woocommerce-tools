@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost WooCommerce Order Details
  * Description: Replaces the WooCommerce My Account order view with a responsive invoice-style order details page.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -12,6 +14,10 @@
 
 if ( ! defined('ABSPATH') ) {
     exit;
+}
+
+function rkvo_text($fa, $en) {
+    return strpos(determine_locale(), 'fa') === 0 ? $fa : $en;
 }
 
 if (function_exists('ritahost_register_admin_tool')) {
@@ -49,7 +55,7 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
         $order    = wc_get_order($order_id);
 
         if ( ! $order ) {
-            wc_print_notice('سفارش مورد نظر پیدا نشد.', 'error');
+            wc_print_notice(rkvo_text('سفارش مورد نظر پیدا نشد.', 'The requested order was not found.'), 'error');
             return;
         }
 
@@ -59,7 +65,7 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
             (int) $order->get_customer_id() !== (int) $current_user_id
             && ! current_user_can('manage_woocommerce')
         ) {
-            wc_print_notice('شما اجازه مشاهده این سفارش را ندارید.', 'error');
+            wc_print_notice(rkvo_text('شما اجازه مشاهده این سفارش را ندارید.', 'You are not allowed to view this order.'), 'error');
             return;
         }
 
@@ -851,16 +857,16 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
 
             <div class="rkvo-actions-top">
                 <a class="rkvo-btn rkvo-btn--ghost" href="<?php echo esc_url($orders_url); ?>">
-                    ← بازگشت به سفارش‌ها
+                    <?php echo esc_html(rkvo_text('← بازگشت به سفارش‌ها', '← Back to orders')); ?>
                 </a>
 
                 <div class="rkvo-action-group">
                     <button type="button" class="rkvo-btn rkvo-btn--primary" onclick="window.print();">
-                        چاپ / ذخیره PDF
+                        <?php echo esc_html(rkvo_text('چاپ / ذخیره PDF', 'Print / Save PDF')); ?>
                     </button>
 
                     <button type="button" class="rkvo-btn rkvo-btn--outline" onclick="window.print();">
-                        دریافت فاکتور
+                        <?php echo esc_html(rkvo_text('دریافت فاکتور', 'Download invoice')); ?>
                     </button>
                 </div>
             </div>
@@ -869,29 +875,29 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
 
                 <div class="rkvo-invoice-head">
                     <div class="rkvo-title-block">
-                        <h1>جزئیات سفارش</h1>
+                        <h1><?php echo esc_html(rkvo_text('جزئیات سفارش', 'Order details')); ?></h1>
                         <p>
-                            فاکتور سفارش شماره
+                            <?php echo esc_html(rkvo_text('فاکتور سفارش شماره', 'Invoice for order')); ?>
                             <strong dir="ltr">#<?php echo esc_html($order_number); ?></strong>
-                            در حساب کاربری شما.
+                            <?php echo esc_html(rkvo_text('در حساب کاربری شما.', 'in your account.')); ?>
                         </p>
                     </div>
 
                     <div class="rkvo-brand">
-                        <div class="rkvo-brand-name">روبیکالا</div>
-                        <div class="rkvo-brand-sub">فاکتور خرید فروشگاه آنلاین</div>
+                        <div class="rkvo-brand-name">RitaHost</div>
+                        <div class="rkvo-brand-sub"><?php echo esc_html(rkvo_text('فاکتور خرید فروشگاه آنلاین', 'Online store invoice')); ?></div>
                     </div>
                 </div>
 
                 <div class="rkvo-summary">
 
                     <div class="rkvo-summary-item">
-                        <span class="rkvo-label">شماره سفارش</span>
+                        <span class="rkvo-label"><?php echo esc_html(rkvo_text('شماره سفارش', 'Order number')); ?></span>
                         <span class="rkvo-value" dir="ltr">#<?php echo esc_html($order_number); ?></span>
                     </div>
 
                     <div class="rkvo-summary-item">
-                        <span class="rkvo-label">تاریخ ثبت سفارش</span>
+                        <span class="rkvo-label"><?php echo esc_html(rkvo_text('تاریخ ثبت سفارش', 'Order date')); ?></span>
                         <span class="rkvo-value"><?php echo esc_html($order_date); ?></span>
                         <?php if ($order_time) : ?>
                             <span class="rkvo-value-small"><?php echo esc_html($order_time); ?></span>
@@ -899,14 +905,14 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                     </div>
 
                     <div class="rkvo-summary-item">
-                        <span class="rkvo-label">وضعیت سفارش</span>
+                        <span class="rkvo-label"><?php echo esc_html(rkvo_text('وضعیت سفارش', 'Order status')); ?></span>
                         <span class="rkvo-status-pill is-<?php echo esc_attr($order_status); ?>">
                             <?php echo esc_html($status_name); ?>
                         </span>
                     </div>
 
                     <div class="rkvo-summary-item">
-                        <span class="rkvo-label">روش پرداخت</span>
+                        <span class="rkvo-label"><?php echo esc_html(rkvo_text('روش پرداخت', 'Payment method')); ?></span>
                         <span class="rkvo-value">
                             <?php echo $payment_title ? esc_html($payment_title) : '—'; ?>
                         </span>
@@ -919,7 +925,7 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                         <div class="rkvo-address-line">
                             <span class="rkvo-address-icon">⌁</span>
                             <span>
-                                کد رهگیری:
+                                <?php echo esc_html(rkvo_text('کد رهگیری:', 'Tracking code:')); ?>
                                 <strong dir="ltr" style="color:var(--rkvo-purple);"><?php echo esc_html($tracking_code); ?></strong>
                             </span>
                         </div>
@@ -929,16 +935,16 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                 <div class="rkvo-section">
 
                     <div class="rkvo-section-title">
-                        <h2>اقلام سفارش</h2>
+                        <h2><?php echo esc_html(rkvo_text('اقلام سفارش', 'Order items')); ?></h2>
                     </div>
 
                     <div class="rkvo-products">
 
                         <div class="rkvo-product-head">
-                            <div>محصول</div>
-                            <div>قیمت واحد</div>
-                            <div>تعداد</div>
-                            <div style="text-align:left;">جمع جزء</div>
+                            <div><?php echo esc_html(rkvo_text('محصول', 'Product')); ?></div>
+                            <div><?php echo esc_html(rkvo_text('قیمت واحد', 'Unit price')); ?></div>
+                            <div><?php echo esc_html(rkvo_text('تعداد', 'Quantity')); ?></div>
+                            <div style="text-align:left;"><?php echo esc_html(rkvo_text('جمع جزء', 'Subtotal')); ?></div>
                         </div>
 
                         <?php foreach ($order->get_items() as $item_id => $item) : ?>
@@ -981,15 +987,15 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
 
                                             <div class="rkvo-product-meta">
                                                 <?php if ($product_sku) : ?>
-                                                    کد محصول: <?php echo esc_html($product_sku); ?>
+                                                    <?php echo esc_html(rkvo_text('کد محصول:', 'SKU:')); ?> <?php echo esc_html($product_sku); ?>
                                                 <?php else : ?>
-                                                    کد آیتم: <?php echo esc_html($item_id); ?>
+                                                    <?php echo esc_html(rkvo_text('کد آیتم:', 'Item ID:')); ?> <?php echo esc_html($item_id); ?>
                                                 <?php endif; ?>
 
                                                 <?php
                                                 $item_meta = wc_display_item_meta($item, array(
                                                     'echo'      => false,
-                                                    'separator' => '، ',
+                                                    'separator' => rkvo_text('، ', ', '),
                                                 ));
 
                                                 if ($item_meta) {
@@ -1002,17 +1008,17 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                                     </div>
                                 </div>
 
-                                <div class="rkvo-product-cell" data-label="قیمت واحد">
+                                <div class="rkvo-product-cell" data-label="<?php echo esc_attr(rkvo_text('قیمت واحد', 'Unit price')); ?>">
                                     <span class="rkvo-money">
                                         <?php echo wp_kses_post(wc_price($unit_price, array('currency' => $currency))); ?>
                                     </span>
                                 </div>
 
-                                <div class="rkvo-product-cell" data-label="تعداد">
+                                <div class="rkvo-product-cell" data-label="<?php echo esc_attr(rkvo_text('تعداد', 'Quantity')); ?>">
                                     <span class="rkvo-qty"><?php echo esc_html($qty); ?></span>
                                 </div>
 
-                                <div class="rkvo-product-cell" data-label="جمع جزء" style="text-align:left;">
+                                <div class="rkvo-product-cell" data-label="<?php echo esc_attr(rkvo_text('جمع جزء', 'Subtotal')); ?>" style="text-align:left;">
                                     <span class="rkvo-money">
                                         <?php echo wp_kses_post($order->get_formatted_line_subtotal($item)); ?>
                                     </span>
@@ -1056,17 +1062,17 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                 <div class="rkvo-section">
 
                     <div class="rkvo-section-title">
-                        <h2>وضعیت و روند سفارش</h2>
+                        <h2><?php echo esc_html(rkvo_text('وضعیت و روند سفارش', 'Order progress')); ?></h2>
                     </div>
 
                     <?php
                     $progress_width = rkvo_get_progress_width($progress_level);
                     $steps = array(
-                        array('label' => 'ثبت سفارش', 'icon' => '✓', 'date' => $order_date),
-                        array('label' => 'در حال بررسی', 'icon' => '□', 'date' => $progress_level >= 2 ? $order_date : 'در انتظار'),
-                        array('label' => 'بسته‌بندی', 'icon' => '▣', 'date' => $progress_level >= 3 ? $order_date : 'در انتظار'),
-                        array('label' => 'تحویل به پست', 'icon' => '⌁', 'date' => $progress_level >= 4 ? $order_date : 'در انتظار'),
-                        array('label' => 'تحویل شده', 'icon' => '✓', 'date' => $progress_level >= 5 ? $order_date : 'در انتظار'),
+                        array('label' => rkvo_text('ثبت سفارش', 'Order placed'), 'icon' => '✓', 'date' => $order_date),
+                        array('label' => rkvo_text('در حال بررسی', 'Processing'), 'icon' => '□', 'date' => $progress_level >= 2 ? $order_date : rkvo_text('در انتظار', 'Pending')),
+                        array('label' => rkvo_text('بسته‌بندی', 'Packing'), 'icon' => '▣', 'date' => $progress_level >= 3 ? $order_date : rkvo_text('در انتظار', 'Pending')),
+                        array('label' => rkvo_text('تحویل به پست', 'Handed to carrier'), 'icon' => '⌁', 'date' => $progress_level >= 4 ? $order_date : rkvo_text('در انتظار', 'Pending')),
+                        array('label' => rkvo_text('تحویل شده', 'Delivered'), 'icon' => '✓', 'date' => $progress_level >= 5 ? $order_date : rkvo_text('در انتظار', 'Pending')),
                     );
                     ?>
 
@@ -1097,7 +1103,7 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                 <div class="rkvo-section">
 
                     <div class="rkvo-section-title">
-                        <h2>آدرس صورتحساب</h2>
+                        <h2><?php echo esc_html(rkvo_text('آدرس صورتحساب', 'Billing address')); ?></h2>
                     </div>
 
                     <div class="rkvo-address-card">
@@ -1136,7 +1142,7 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                                             $billing_full_address,
                                         ));
 
-                                        echo esc_html(implode('، ', $address_parts));
+                                        echo esc_html(implode(rkvo_text('، ', ', '), $address_parts));
                                         ?>
                                     </span>
                                 </div>
@@ -1145,13 +1151,13 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
                             <?php if ($billing_postcode) : ?>
                                 <div class="rkvo-address-line">
                                     <span class="rkvo-address-icon">⌁</span>
-                                    <span>کد پستی: <?php echo esc_html($billing_postcode); ?></span>
+                                    <span><?php echo esc_html(rkvo_text('کد پستی:', 'Postcode:')); ?> <?php echo esc_html($billing_postcode); ?></span>
                                 </div>
                             <?php endif; ?>
 
                             <?php if ( ! $billing_name && ! $billing_phone && ! $billing_full_address ) : ?>
                                 <div class="rkvo-empty">
-                                    برای این سفارش آدرس صورتحساب ثبت نشده است.
+                                    <?php echo esc_html(rkvo_text('برای این سفارش آدرس صورتحساب ثبت نشده است.', 'No billing address was recorded for this order.')); ?>
                                 </div>
                             <?php endif; ?>
 
@@ -1159,7 +1165,7 @@ if ( ! function_exists('rkvo_render_invoice_view_order') ) {
 
                         <div>
                             <a class="rkvo-btn rkvo-btn--outline" href="<?php echo esc_url($edit_address_url); ?>">
-                                ویرایش آدرس
+                                <?php echo esc_html(rkvo_text('ویرایش آدرس', 'Edit address')); ?>
                             </a>
                         </div>
 

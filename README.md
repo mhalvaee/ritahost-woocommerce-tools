@@ -9,6 +9,12 @@ A modular collection of independent WordPress plugins for improving WooCommerce 
 
 Each tool can run independently as a regular plugin or join the shared, language-aware **RitaHost Panel** when installed as a must-use plugin. Admin labels follow the active WordPress locale: Persian sites see Persian labels and English sites see English labels.
 
+## Screenshots
+
+| English administration | Persian administration |
+| --- | --- |
+| ![RitaHost Panel in English](screenshots/ritahost-panel-en.png) | ![RitaHost Panel in Persian](screenshots/ritahost-panel-fa.png) |
+
 ## Highlights
 
 - Modular architecture: install only the tools a site needs.
@@ -63,4 +69,3 @@ Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before submit
 ## License
 
 Licensed under the GNU General Public License v2.0 or later. See [LICENSE](LICENSE).
-

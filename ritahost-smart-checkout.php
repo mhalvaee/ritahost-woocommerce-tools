@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost Smart Checkout
  * Description: Adds reusable WooCommerce checkout templates, weekly delivery schedules, fulfillment controls, and additional order fields.
- * Version: 12.1.1
+ * Version: 12.1.2
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -14,18 +16,23 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+if (!function_exists('rkzn_text')) {
+    function rkzn_text($fa, $en) {
+        return strpos(determine_locale(), 'fa') === 0 ? $fa : $en;
+    }
+}
+
 /*
- * این ثابت باعث می‌شود نسخه‌های قبلی rubikala-checkout.php که در mu-plugins
- * باقی مانده‌اند، پس از لود این فایل اجرا نشوند.
+ * این ثابت مانع ثبت هم‌زمان هوک‌ها توسط نسخه‌های قدیمی همین چک‌اوت می‌شود.
  */
 if (!defined('RK_CHECKOUT_MU_LOADED')) {
-    define('RK_CHECKOUT_MU_LOADED', '12.1.1-smart-checkout');
+    define('RK_CHECKOUT_MU_LOADED', '12.1.2-smart-checkout');
 }
 
 if (defined('RKZN_CHECKOUT_LOADED')) {
     return;
 }
-define('RKZN_CHECKOUT_LOADED', '12.1.1');
+define('RKZN_CHECKOUT_LOADED', '12.1.2');
 define('RKZN_CHECKOUT_DIR', __DIR__ . '/ritahost-smart-checkout/');
 define('RKZN_CHECKOUT_OPTION', 'rtsc_checkout_settings');
 
@@ -684,8 +691,8 @@ function rkzn_settings_page() {
                     <label>پیش‌تنظیم ظاهر</label>
                     <select name="' . $option . '[appearance_preset]">
                         <option value="custom">سفارشی</option>
-                        <option value="rubikala">روبیکالا</option>
-                        <option value="zanoone">زنونه</option>
+                        <option value="purple">RitaHost Purple</option>
+                        <option value="rose">Rose Store</option>
                         <option value="medical">فروشگاه پزشکی</option>
                         <option value="minimal">مینیمال</option>
                     </select>
@@ -2496,4 +2503,3 @@ add_action('wp_footer', function () {
     </script>
     <?php
 }, PHP_INT_MAX);
-

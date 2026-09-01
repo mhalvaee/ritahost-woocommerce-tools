@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
 <table class="shop_table woocommerce-checkout-review-order-table">
     <tbody>
         <tr class="cart-subtotal">
-            <th>جمع کل کالاها</th>
+            <th><?php echo esc_html(rkzn_text('جمع کل کالاها', 'Products subtotal')); ?></th>
             <td><?php wc_cart_totals_subtotal_html(); ?></td>
         </tr>
 
@@ -27,14 +27,14 @@ defined('ABSPATH') || exit;
 
         <?php if (WC()->cart->needs_shipping()) : ?>
             <tr class="rkzn-summary-shipping">
-                <th>هزینه ارسال</th>
+                <th><?php echo esc_html(rkzn_text('هزینه ارسال', 'Shipping')); ?></th>
                 <td><?php echo wp_kses_post(WC()->cart->get_cart_shipping_total()); ?></td>
             </tr>
         <?php endif; ?>
 
         <?php $saving = rkzn_savings_total(); if ($saving > 0) : ?>
             <tr class="rkzn-saving-row">
-                <th>سود شما از این خرید</th>
+                <th><?php echo esc_html(rkzn_text('سود شما از این خرید', 'You save')); ?></th>
                 <td><?php echo wp_kses_post(wc_price($saving)); ?></td>
             </tr>
         <?php endif; ?>
@@ -53,7 +53,7 @@ defined('ABSPATH') || exit;
         <?php endif; ?>
 
         <tr class="order-total">
-            <th>مبلغ قابل پرداخت</th>
+            <th><?php echo esc_html(rkzn_text('مبلغ قابل پرداخت', 'Total')); ?></th>
             <td><?php wc_cart_totals_order_total_html(); ?></td>
         </tr>
     </tbody>

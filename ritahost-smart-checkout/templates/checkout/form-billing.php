@@ -161,4 +161,3 @@ if ($birth_key === '') {
         <?php do_action('woocommerce_after_checkout_registration_form', $checkout); ?>
     </div>
 <?php endif; ?>
-

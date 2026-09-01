@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost Product Workflow Statuses
  * Description: Adds configurable-style workflow statuses to WooCommerce products and exposes them in product bulk actions.
- * Version: 1.0.0
+ * Version: 1.1.1
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -12,16 +14,20 @@
 
 if (!defined('ABSPATH')) exit;
 
+function rhpws_text($fa, $en) {
+    return strpos(determine_locale(), 'fa') === 0 ? $fa : $en;
+}
+
 if (function_exists('ritahost_register_admin_tool')) {
     ritahost_register_admin_tool('ritahost-product-workflow-statuses', 'وضعیت‌های گردش کار محصول', 'Product Workflow Statuses', 'وضعیت‌های داخلی محصولات دارویی را به فهرست و عملیات گروهی ووکامرس اضافه می‌کند.', 'Adds internal product workflow statuses and WooCommerce bulk actions.', 'manage_woocommerce');
 }
 
 function pharma_workflow_statuses_list() {
     return [
-        'pharma_future' => 'بک محصولات در آینده',
-        'pharma_waiting' => 'در انتظار داروخانه',
-        'pharma_approved' => 'تایید داروخونه',
-        'pharma_code_diff' => 'اختلاف کد',
+        'pharma_future' => rhpws_text('محصولات آینده', 'Future products'),
+        'pharma_waiting' => rhpws_text('در انتظار داروخانه', 'Waiting for pharmacy'),
+        'pharma_approved' => rhpws_text('تأیید داروخانه', 'Pharmacy approved'),
+        'pharma_code_diff' => rhpws_text('اختلاف کد', 'Code mismatch'),
     ];
 }
 
@@ -74,10 +80,10 @@ add_filter('views_edit-product', function ($views) {
 add_filter('bulk_actions-edit-product', function ($actions) {
 
     foreach (pharma_workflow_statuses_list() as $key => $label) {
-        $actions['pharma_set_' . $key] = 'تغییر وضعیت به ' . $label;
+        $actions['pharma_set_' . $key] = sprintf(rhpws_text('تغییر وضعیت به %s', 'Change status to %s'), $label);
     }
 
-    $actions['pharma_set_publish'] = 'انتشار محصولات انتخاب‌شده';
+    $actions['pharma_set_publish'] = rhpws_text('انتشار محصولات انتخاب‌شده', 'Publish selected products');
 
     return $actions;
 });
@@ -105,16 +111,36 @@ add_filter('handle_bulk_actions-edit-product', function ($redirect_to, $action, 
         return $redirect_to;
     }
 
-    foreach ($post_ids as $post_id) {
-        if (get_post_type($post_id) === 'product') {
-            wp_update_post([
-                'ID'          => $post_id,
-                'post_status' => $new_status,
-            ]);
+    $changed = 0;
+    $post_type = get_post_type_object('product');
+    $publish_capability = $post_type && !empty($post_type->cap->publish_posts)
+        ? $post_type->cap->publish_posts
+        : 'publish_products';
+
+    foreach (array_unique(array_map('absint', (array) $post_ids)) as $post_id) {
+        if (!$post_id || get_post_type($post_id) !== 'product') {
+            continue;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            continue;
+        }
+
+        if ($new_status === 'publish' && !current_user_can($publish_capability)) {
+            continue;
+        }
+
+        $result = wp_update_post([
+            'ID'          => $post_id,
+            'post_status' => $new_status,
+        ], true);
+
+        if (!is_wp_error($result) && $result) {
+            $changed++;
         }
     }
 
-    return add_query_arg('pharma_changed', count($post_ids), $redirect_to);
+    return add_query_arg('pharma_changed', $changed, $redirect_to);
 
 }, 10, 3);
 
@@ -125,7 +151,10 @@ add_action('admin_notices', function () {
 
     if (!empty($_GET['pharma_changed'])) {
         echo '<div class="notice notice-success is-dismissible"><p>';
-        echo intval($_GET['pharma_changed']) . ' محصول با موفقیت تغییر وضعیت داده شد.';
+        printf(
+            esc_html(rhpws_text('%d محصول با موفقیت تغییر وضعیت داده شد.', '%d products were updated successfully.')),
+            intval($_GET['pharma_changed'])
+        );
         echo '</p></div>';
     }
 
@@ -236,4 +265,3 @@ add_action('admin_footer-edit.php', function () {
     </script>
     <?php
 });
-

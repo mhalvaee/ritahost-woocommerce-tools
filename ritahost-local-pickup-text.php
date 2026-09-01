@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost Local Pickup Text
  * Description: Adds configurable pickup instructions and a map link to the WooCommerce checkout without embedding site-specific location data.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -104,14 +106,20 @@ add_action('wp_footer', function(){
 
         function changePickupText(){
 
-            document.querySelectorAll('.rkzn-shipping-option').forEach(function(item){
+            document.querySelectorAll('.rkzn-shipping-option, .woocommerce-shipping-methods li').forEach(function(item){
 
-                const title = item.querySelector('strong');
-                const desc  = item.querySelector('small');
+                const title = item.querySelector('strong, label');
+                let desc  = item.querySelector('small, .ritahost-pickup-description');
 
-                if(!title || !desc) return;
+                if(!title) return;
 
                 if(title.innerText.includes(pickupConfig.matchText)){
+                    if (!desc) {
+                        desc = document.createElement('small');
+                        desc.className = 'ritahost-pickup-description';
+                        desc.style.display = 'block';
+                        item.append(desc);
+                    }
                     desc.textContent = '';
                     desc.append(document.createTextNode('📍 ' + pickupConfig.address));
 
@@ -147,4 +155,3 @@ add_action('wp_footer', function(){
 
     <?php
 });
-

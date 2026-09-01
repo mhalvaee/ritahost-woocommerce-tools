@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost WooCommerce Address Card
  * Description: Displays WooCommerce My Account addresses as responsive cards without an add-address button.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -14,12 +16,16 @@ if ( ! defined('ABSPATH') ) {
     exit;
 }
 
+function rhac_text($fa, $en) {
+    return strpos(determine_locale(), 'fa') === 0 ? $fa : $en;
+}
+
 if (function_exists('ritahost_register_admin_tool')) {
     ritahost_register_admin_tool('ritahost-address-card', 'کارت آدرس حساب کاربری', 'Account Address Card', 'آدرس‌های صورتحساب و ارسال ووکامرس را به شکل کارت واکنش‌گرا نمایش می‌دهد.', 'Displays WooCommerce billing and shipping addresses as responsive cards.', 'manage_options');
 }
 
 /* ============================
-   Rubikala - My Address Card Style
+   RitaHost - WooCommerce account address card
    بدون دکمه افزودن آدرس
    ============================ */
 
@@ -34,14 +40,14 @@ add_action('wp', function () {
     }
 
     remove_action('woocommerce_account_edit-address_endpoint', 'woocommerce_account_edit_address');
-    add_action('woocommerce_account_edit-address_endpoint', 'rk_rubikala_address_card_only', 10, 1);
+    add_action('woocommerce_account_edit-address_endpoint', 'rhac_render_address_card', 10, 1);
 
 }, 99);
 
 
-if ( ! function_exists('rk_rubikala_address_card_only') ) {
+if ( ! function_exists('rhac_render_address_card') ) {
 
-    function rk_rubikala_address_card_only($type = '') {
+    function rhac_render_address_card($type = '') {
 
         /*
          * وقتی کاربر وارد فرم ویرایش billing یا shipping شد،
@@ -253,13 +259,13 @@ if ( ! function_exists('rk_rubikala_address_card_only') ) {
 
             <div class="rk-address-title">
                 <span class="rk-location-icon">●</span>
-                <h2>آدرس های من</h2>
+                <h2><?php echo esc_html(rhac_text('آدرس‌های من', 'My addresses')); ?></h2>
             </div>
 
             <div class="rk-address-card">
 
                 <a class="rk-address-edit" href="<?php echo esc_url($edit_url); ?>">
-                    ویرایش آدرس
+                    <?php echo esc_html(rhac_text('ویرایش آدرس', 'Edit address')); ?>
                 </a>
 
                 <?php if ($has_address) : ?>
@@ -283,7 +289,7 @@ if ( ! function_exists('rk_rubikala_address_card_only') ) {
                         <?php if (! empty($state) || ! empty($city)) : ?>
                             <div class="rk-address-row">
                                 <span class="rk-ico">●</span>
-                                <span><?php echo esc_html(trim($state . '، ' . $city, '، ')); ?></span>
+                                <span><?php echo esc_html(trim($state . rhac_text('، ', ', ') . $city, rhac_text('، ', ', '))); ?></span>
                             </div>
                         <?php endif; ?>
 
@@ -297,7 +303,7 @@ if ( ! function_exists('rk_rubikala_address_card_only') ) {
                         <?php if (! empty($postcode)) : ?>
                             <div class="rk-address-row">
                                 <span class="rk-ico">↯</span>
-                                <span>کد پستی: <?php echo esc_html($postcode); ?></span>
+                                <span><?php echo esc_html(rhac_text('کد پستی:', 'Postcode:')); ?> <?php echo esc_html($postcode); ?></span>
                             </div>
                         <?php endif; ?>
 
@@ -306,9 +312,9 @@ if ( ! function_exists('rk_rubikala_address_card_only') ) {
                 <?php else : ?>
 
                     <div class="rk-address-empty">
-                        هنوز آدرسی ثبت نشده است.
+                        <?php echo esc_html(rhac_text('هنوز آدرسی ثبت نشده است.', 'No address has been saved yet.')); ?>
                         <br>
-                        <a href="<?php echo esc_url($edit_url); ?>">ثبت آدرس</a>
+                        <a href="<?php echo esc_url($edit_url); ?>"><?php echo esc_html(rhac_text('ثبت آدرس', 'Add address')); ?></a>
                     </div>
 
                 <?php endif; ?>

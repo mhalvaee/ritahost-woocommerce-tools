@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost WooCommerce Account Dashboard
  * Description: Replaces the WooCommerce My Account dashboard with configurable cards, order summaries, and account tools.
- * Version: 3.3.0
+ * Version: 3.3.1
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -12,10 +14,14 @@
 
 if (!defined('ABSPATH')) exit;
 
+function rk_text($fa, $en) {
+    return strpos(determine_locale(), 'fa') === 0 ? $fa : $en;
+}
+
 if (defined('RITAHOST_CUSTOM_DASHBOARD_MU_LOADED')) {
     return;
 }
-define('RITAHOST_CUSTOM_DASHBOARD_MU_LOADED', '3.3.0');
+define('RITAHOST_CUSTOM_DASHBOARD_MU_LOADED', '3.3.1');
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +30,7 @@ define('RITAHOST_CUSTOM_DASHBOARD_MU_LOADED', '3.3.0');
 | برای تحویل به مشتری جدید، فقط رنگ‌های این بخش را تغییر بده.
 | همه CSSهای اصلی پایین فایل از همین ثابت‌ها خوانده می‌شوند.
 */
-if (!defined('RK_BRAND_NAME')) define('RK_BRAND_NAME', 'ریتاهاست');
+if (!defined('RK_BRAND_NAME')) define('RK_BRAND_NAME', 'RitaHost');
 
 if (!defined('RK_COLOR_PRIMARY')) define('RK_COLOR_PRIMARY', '#6c1faf');
 if (!defined('RK_COLOR_PRIMARY_SOFT')) define('RK_COLOR_PRIMARY_SOFT', '#f4ecff');
@@ -328,18 +334,18 @@ add_filter('woocommerce_account_menu_items', function () {
         $next_count = is_array($next_list) ? count($next_list) : 0;
     }
 
-    $next_label = 'لیست خرید بعدی' . ($next_count > 0 ? ' (' . number_format_i18n($next_count) . ')' : '');
+    $next_label = rk_text('لیست خرید بعدی', 'Buy later') . ($next_count > 0 ? ' (' . number_format_i18n($next_count) . ')' : '');
 
     return [
-        'dashboard'        => 'داشبورد',
-        'edit-account'     => 'اطلاعات کاربری',
-        'orders'           => 'سفارش‌های من',
+        'dashboard'        => rk_text('داشبورد', 'Dashboard'),
+        'edit-account'     => rk_text('اطلاعات کاربری', 'Account details'),
+        'orders'           => rk_text('سفارش‌های من', 'My orders'),
         'next-purchase'    => $next_label,
-        'edit-address'     => 'آدرس‌های من',
-        'wishlist'         => 'علاقه‌مندی‌های من',
-        'notifications'    => 'پیام‌ها و اعلان‌ها',
-        'reviews'          => 'نقد و بررسی‌های من',
-        'customer-logout'  => 'خروج از حساب',
+        'edit-address'     => rk_text('آدرس‌های من', 'My addresses'),
+        'wishlist'         => rk_text('علاقه‌مندی‌های من', 'My wishlist'),
+        'notifications'    => rk_text('پیام‌ها و اعلان‌ها', 'Notifications'),
+        'reviews'          => rk_text('نقد و بررسی‌های من', 'My reviews'),
+        'customer-logout'  => rk_text('خروج از حساب', 'Log out'),
     ];
 }, 999);
 
@@ -398,44 +404,44 @@ function rk_render_account_dashboard() {
                 </div>
                 <div class="rk-profile-name">
                     <h2><?php echo esc_html($name); ?></h2>
-                    <p class="phonerita"><?php echo $phone ? esc_html(rk_mask_phone($phone)) : 'شماره موبایل ثبت نشده'; ?></p>
-                    <span>تاریخ ثبت‌نام: <?php echo esc_html(date_i18n('Y/m/d', strtotime($user->user_registered))); ?></span>
+                    <p class="phonerita"><?php echo $phone ? esc_html(rk_mask_phone($phone)) : esc_html(rk_text('شماره موبایل ثبت نشده', 'No mobile number saved')); ?></p>
+                    <span><?php echo esc_html(rk_text('تاریخ ثبت‌نام:', 'Member since:')); ?> <?php echo esc_html(date_i18n('Y/m/d', strtotime($user->user_registered))); ?></span>
                 </div>
             </div>
 
             <div class="rk-stats">
                 <div class="rk-stat">
                     <?php echo rk_icon('tag'); ?>
-                    <small>سود از تخفیف‌ها</small>
+                    <small><?php echo esc_html(rk_text('سود از تخفیف‌ها', 'Discount savings')); ?></small>
                     <strong><?php echo wp_kses_post(wc_price($stats['discount'])); ?></strong>
                 </div>
                 <div class="rk-stat">
                     <?php echo rk_icon('bag'); ?>
-                    <small>جمع کل خرید</small>
+                    <small><?php echo esc_html(rk_text('جمع کل خرید', 'Total spent')); ?></small>
                     <strong><?php echo wp_kses_post(wc_price($stats['spent'])); ?></strong>
                 </div>
                 <div class="rk-stat">
                     <?php echo rk_icon('bag'); ?>
-                    <small>جمع سفارشات</small>
-                    <strong><?php echo esc_html(number_format_i18n($stats['count'])); ?> سفارش</strong>
+                    <small><?php echo esc_html(rk_text('جمع سفارشات', 'Total orders')); ?></small>
+                    <strong><?php echo esc_html(number_format_i18n($stats['count'])); ?> <?php echo esc_html(rk_text('سفارش', 'orders')); ?></strong>
                 </div>
             </div>
         </section>
 
         <section class="rk-card">
-            <div class="rk-card-title"><h3>اطلاعات و مشخصات کاربری</h3><?php echo rk_icon('user'); ?></div>
+            <div class="rk-card-title"><h3><?php echo esc_html(rk_text('اطلاعات و مشخصات کاربری', 'Account information')); ?></h3><?php echo rk_icon('user'); ?></div>
             <div class="rk-info-grid">
-                <div><label>نام</label><strong><?php echo esc_html($first_name ?: 'ثبت نشده'); ?></strong></div>
-                <div><label>نام خانوادگی</label><strong><?php echo esc_html($last_name ?: 'ثبت نشده'); ?></strong></div>
-                <div class="phonerita"><label>شماره موبایل</label><strong><?php echo esc_html($phone ? rk_mask_phone($phone) : 'ثبت نشده'); ?></strong></div>
-                <div><label>ایمیل</label><strong><?php echo esc_html($user->user_email ?: 'ثبت نشده'); ?></strong></div>
+                <div><label><?php echo esc_html(rk_text('نام', 'First name')); ?></label><strong><?php echo esc_html($first_name ?: rk_text('ثبت نشده', 'Not provided')); ?></strong></div>
+                <div><label><?php echo esc_html(rk_text('نام خانوادگی', 'Last name')); ?></label><strong><?php echo esc_html($last_name ?: rk_text('ثبت نشده', 'Not provided')); ?></strong></div>
+                <div class="phonerita"><label><?php echo esc_html(rk_text('شماره موبایل', 'Mobile number')); ?></label><strong><?php echo esc_html($phone ? rk_mask_phone($phone) : rk_text('ثبت نشده', 'Not provided')); ?></strong></div>
+                <div><label><?php echo esc_html(rk_text('ایمیل', 'Email')); ?></label><strong><?php echo esc_html($user->user_email ?: rk_text('ثبت نشده', 'Not provided')); ?></strong></div>
             </div>
-            <a class="rk-btn rk-outline" href="<?php echo esc_url(wc_get_account_endpoint_url('edit-account')); ?>">ویرایش اطلاعات</a>
+            <a class="rk-btn rk-outline" href="<?php echo esc_url(wc_get_account_endpoint_url('edit-account')); ?>"><?php echo esc_html(rk_text('ویرایش اطلاعات', 'Edit details')); ?></a>
         </section>
 
         <?php $addresses = rk_get_user_addresses($user_id); ?>
         <section class="rk-card rk-address-card">
-            <div class="rk-card-title"><h3>آدرس‌ها</h3><?php echo rk_icon('pin'); ?></div>
+            <div class="rk-card-title"><h3><?php echo esc_html(rk_text('آدرس‌ها', 'Addresses')); ?></h3><?php echo rk_icon('pin'); ?></div>
 
             <?php if (!empty($addresses)): ?>
                 <div class="rk-address-list">
@@ -461,13 +467,13 @@ function rk_render_account_dashboard() {
                         </article>
                     <?php endforeach; ?>
                 </div>
-                <a class="rk-btn rk-outline" href="<?php echo esc_url(wc_get_account_endpoint_url('edit-address')); ?>">مدیریت آدرس‌ها</a>
+                <a class="rk-btn rk-outline" href="<?php echo esc_url(wc_get_account_endpoint_url('edit-address')); ?>"><?php echo esc_html(rk_text('مدیریت آدرس‌ها', 'Manage addresses')); ?></a>
             <?php else: ?>
                 <div class="rk-empty">
                     <div><?php echo rk_icon('pin'); ?></div>
-                    <strong>هیچ آدرسی ثبت نشده است</strong>
-                    <p>برای خرید سریع‌تر، آدرس خود را ثبت کنید.</p>
-                    <a class="rk-btn rk-outline" href="<?php echo esc_url(wc_get_account_endpoint_url('edit-address')); ?>">افزودن آدرس جدید</a>
+                    <strong><?php echo esc_html(rk_text('هیچ آدرسی ثبت نشده است', 'No address has been saved')); ?></strong>
+                    <p><?php echo esc_html(rk_text('برای خرید سریع‌تر، آدرس خود را ثبت کنید.', 'Save an address for a faster checkout.')); ?></p>
+                    <a class="rk-btn rk-outline" href="<?php echo esc_url(wc_get_account_endpoint_url('edit-address')); ?>"><?php echo esc_html(rk_text('افزودن آدرس جدید', 'Add a new address')); ?></a>
                 </div>
             <?php endif; ?>
         </section>
@@ -749,15 +755,6 @@ add_action('woocommerce_order_status_changed', function ($order_id) {
 
 function rk_get_stats($user_id) {
     $user_id = absint($user_id);
-    $version = rk_get_order_cache_version($user_id);
-    $cache_key = 'rk_acc_stats_' . $user_id . '_' . $version;
-
-    $cached = get_transient($cache_key);
-
-    if (is_array($cached) && isset($cached['spent'], $cached['discount'], $cached['count'])) {
-        return $cached;
-    }
-
     $data = ['spent'=>0,'discount'=>0,'count'=>0];
 
     $orders = rk_get_user_orders_strict($user_id, -1);
@@ -769,21 +766,23 @@ function rk_get_stats($user_id) {
         $data['discount'] += (float) $order->get_discount_total();
     }
 
-    set_transient($cache_key, $data, rk_cache_ttl());
-
     return $data;
 }
 
 function rk_get_last_order_for_user($user_id) {
     $user_id = absint($user_id);
     $version = rk_get_order_cache_version($user_id);
-    $cache_key = 'rk_acc_last_order_' . $user_id . '_' . $version;
+    $email = rk_order_identity_email($user_id);
+    $cache_key = 'rk_acc_last_order_v2_' . $user_id . '_' . $version . '_' . rk_order_identity_hash($user_id);
 
     $cached_order_id = get_transient($cache_key);
 
     if ($cached_order_id !== false) {
         $cached_order_id = absint($cached_order_id);
-        return $cached_order_id ? wc_get_order($cached_order_id) : null;
+        $cached_order = $cached_order_id ? wc_get_order($cached_order_id) : null;
+        return ($cached_order instanceof WC_Order && rk_order_belongs_to_user($cached_order, $user_id, $email))
+            ? $cached_order
+            : null;
     }
 
     /*
@@ -799,8 +798,6 @@ function rk_get_last_order_for_user($user_id) {
 }
 
 function rk_get_user_orders_strict($user_id, $limit = -1) {
-    static $runtime_cache = [];
-
     $orders = [];
     $user_id = absint($user_id);
     $limit = (int) $limit;
@@ -809,12 +806,9 @@ function rk_get_user_orders_strict($user_id, $limit = -1) {
         return $orders;
     }
 
+    $email = rk_order_identity_email($user_id);
     $version = rk_get_order_cache_version($user_id);
-    $runtime_key = $user_id . '_' . $limit . '_' . $version;
-
-    if (isset($runtime_cache[$runtime_key])) {
-        return $runtime_cache[$runtime_key];
-    }
+    $runtime_key = 'v2_' . $user_id . '_' . $limit . '_' . $version . '_' . rk_order_identity_hash($user_id);
 
     $transient_key = 'rk_acc_orders_' . md5($runtime_key);
     $cached_ids = get_transient($transient_key);
@@ -822,19 +816,13 @@ function rk_get_user_orders_strict($user_id, $limit = -1) {
     if (is_array($cached_ids)) {
         foreach ($cached_ids as $order_id) {
             $order = wc_get_order(absint($order_id));
-            if ($order instanceof WC_Order) {
+            if ($order instanceof WC_Order && rk_order_belongs_to_user($order, $user_id, $email)) {
                 $orders[] = $order;
             }
         }
 
-        $runtime_cache[$runtime_key] = $orders;
         return $orders;
     }
-
-    $user  = get_userdata($user_id);
-    $email = $user && !empty($user->user_email) ? sanitize_email($user->user_email) : '';
-    $phone = get_user_meta($user_id, 'billing_phone', true);
-    $phone_variations = rk_phone_variations($phone);
 
     $statuses = array_keys(wc_get_order_statuses());
     $statuses = array_values(array_diff($statuses, ['wc-cancelled', 'wc-refunded', 'wc-failed', 'wc-checkout-draft']));
@@ -851,7 +839,7 @@ function rk_get_user_orders_strict($user_id, $limit = -1) {
         'orderby'     => 'date',
         'order'       => 'DESC',
         'return'      => 'objects',
-    ], $user_id, $email, $phone_variations);
+    ], $user_id, $email);
 
     /*
      * 2) سفارش‌های مهمان یا سفارش‌هایی که فقط با ایمیل همین کاربر ثبت شده‌اند.
@@ -864,18 +852,7 @@ function rk_get_user_orders_strict($user_id, $limit = -1) {
             'orderby'       => 'date',
             'order'         => 'DESC',
             'return'        => 'objects',
-        ], $user_id, $email, $phone_variations);
-    }
-
-    /*
-     * 3) سفارش‌هایی که با شماره موبایل همین کاربر ثبت شده‌اند.
-     * این بخش محدود و کش‌شده است تا روی دیتابیس فشار زیاد وارد نکند.
-     */
-    foreach (rk_find_order_ids_by_phone($phone_variations, $statuses, $query_limit) as $order_id) {
-        $order = wc_get_order($order_id);
-        if ($order instanceof WC_Order && rk_order_belongs_to_user($order, $user_id, $email, $phone_variations)) {
-            $orders[$order->get_id()] = $order;
-        }
+    ], $user_id, $email);
     }
 
     $orders = array_values($orders);
@@ -899,11 +876,10 @@ function rk_get_user_orders_strict($user_id, $limit = -1) {
 
     set_transient($transient_key, $order_ids, rk_cache_ttl());
 
-    $runtime_cache[$runtime_key] = $orders;
     return $orders;
 }
 
-function rk_collect_orders_strict(&$orders, $args, $user_id, $email, $phone_variations) {
+function rk_collect_orders_strict(&$orders, $args, $user_id, $email) {
     try {
         $found = wc_get_orders($args);
     } catch (Throwable $e) {
@@ -913,19 +889,26 @@ function rk_collect_orders_strict(&$orders, $args, $user_id, $email, $phone_vari
     if (!$found) return;
 
     foreach ($found as $order) {
-        if ($order instanceof WC_Order && rk_order_belongs_to_user($order, $user_id, $email, $phone_variations)) {
+        if ($order instanceof WC_Order && rk_order_belongs_to_user($order, $user_id, $email)) {
             $orders[$order->get_id()] = $order;
         }
     }
 }
 
-function rk_order_belongs_to_user($order, $user_id, $email = '', $phone_variations = []) {
+function rk_order_belongs_to_user($order, $user_id, $email = '') {
     if (!$order instanceof WC_Order) {
         return false;
     }
 
-    if ((int) $order->get_customer_id() === (int) $user_id) {
+    $owner_id = (int) $order->get_customer_id();
+
+    if ($owner_id === (int) $user_id) {
         return true;
+    }
+
+    // A registered order can never be claimed by matching editable profile fields.
+    if ($owner_id !== 0) {
+        return false;
     }
 
     $billing_email = sanitize_email($order->get_billing_email());
@@ -933,15 +916,16 @@ function rk_order_belongs_to_user($order, $user_id, $email = '', $phone_variatio
         return true;
     }
 
-    $order_phone_digits = preg_replace('/\D+/', '', (string) $order->get_billing_phone());
-    if ($order_phone_digits && $phone_variations) {
-        $order_phone_variations = rk_phone_variations($order_phone_digits);
-        if (array_intersect($phone_variations, $order_phone_variations)) {
-            return true;
-        }
-    }
-
     return false;
+}
+
+function rk_order_identity_email($user_id) {
+    $user = get_userdata(absint($user_id));
+    return $user && !empty($user->user_email) ? sanitize_email($user->user_email) : '';
+}
+
+function rk_order_identity_hash($user_id) {
+    return substr(hash('sha256', strtolower(rk_order_identity_email($user_id))), 0, 16);
 }
 
 function rk_hpos_order_tables_available() {

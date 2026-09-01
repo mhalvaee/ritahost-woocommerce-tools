@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom checkout form – Zanoone reference structure.
+ * Custom checkout form – RitaHost reusable structure.
  */
 defined('ABSPATH') || exit;
 
@@ -15,12 +15,12 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
     <div class="rkzn-layout">
         <div class="rkzn-summary-column">
             <aside class="rkzn-summary">
-                <h3 class="rkzn-summary-title">سفارش شما</h3>
+                <h3 class="rkzn-summary-title"><?php echo esc_html(rkzn_text('سفارش شما', 'Your order')); ?></h3>
                 <div id="order_review" class="woocommerce-checkout-review-order">
                     <?php woocommerce_order_review(); ?>
                 </div>
                 <div id="rkzn-place-order-host" class="rkzn-place-order-host"></div>
-                <a class="rkzn-summary-back" href="<?php echo esc_url(wc_get_cart_url()); ?>">بازگشت به سبد خرید</a>
+                <a class="rkzn-summary-back" href="<?php echo esc_url(wc_get_cart_url()); ?>"><?php echo esc_html(rkzn_text('بازگشت به سبد خرید', 'Back to cart')); ?></a>
             </aside>
         </div>
 
@@ -29,8 +29,8 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
 
             <section id="rkzn-address-form" class="rkzn-section rkzn-address-form-section">
                 <div class="rkzn-address-form-header">
-                    <h3>وارد کردن آدرس:</h3>
-                    <button type="button" class="rkzn-clear-fields"><?php echo rkzn_icon('trash'); ?> پاک کردن</button>
+                    <h3><?php echo esc_html(rkzn_text('وارد کردن آدرس:', 'Enter address:')); ?></h3>
+                    <button type="button" class="rkzn-clear-fields"><?php echo rkzn_icon('trash'); ?> <?php echo esc_html(rkzn_text('پاک کردن', 'Clear')); ?></button>
                 </div>
                 <?php do_action('woocommerce_checkout_billing'); ?>
             </section>
@@ -46,4 +46,3 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
     </div>
 </form>
 <?php do_action('woocommerce_after_checkout_form', $checkout); ?>
-

@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost WooCommerce Order Invoice
  * Description: Adds configurable invoice-style WooCommerce thank-you and order-payment pages with a print-friendly invoice table.
- * Version: 3.1.1
+ * Version: 3.2.0
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -12,12 +14,16 @@
 
 defined( 'ABSPATH' ) || exit;
 
+function rhi_text( $fa, $en ) {
+	return strpos( determine_locale(), 'fa' ) === 0 ? $fa : $en;
+}
+
 if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 	final class RHI_Woo_Invoice_MU {
 
 		const OPTION_KEY = 'rhi_woo_invoice_settings';
-		const VERSION    = '3.1.1';
+		const VERSION    = '3.2.0';
 
 		public static function init() {
 			add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ), 99 );
@@ -135,9 +141,9 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 				'text'          => '#152033',
 				'muted'         => '#718096',
 				'border'        => '#D8E3EA',
-				'success_title' => 'سفارش شما با موفقیت ثبت شد',
-				'invoice_title' => 'جزئیات فاکتور',
-				'footer_note'   => 'این فاکتور بر اساس اطلاعات ثبت‌شده در سفارش ایجاد شده است.',
+				'success_title' => rhi_text( 'سفارش شما با موفقیت ثبت شد', 'Your order was placed successfully' ),
+				'invoice_title' => rhi_text( 'جزئیات فاکتور', 'Invoice details' ),
+				'footer_note'   => rhi_text( 'این فاکتور بر اساس اطلاعات ثبت‌شده در سفارش ایجاد شده است.', 'This invoice was generated from the information recorded with the order.' ),
 			);
 		}
 
@@ -197,23 +203,23 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 			$s = self::settings();
 
 			$colors = array(
-				'primary'    => 'رنگ اصلی',
-				'accent'     => 'رنگ موفقیت',
-				'background' => 'پس‌زمینه فاکتور',
-				'surface'    => 'رنگ کارت‌ها',
-				'text'       => 'رنگ متن اصلی',
-				'muted'      => 'رنگ متن ثانویه',
-				'border'     => 'رنگ خطوط و کادرها',
+				'primary'    => rhi_text( 'رنگ اصلی', 'Primary color' ),
+				'accent'     => rhi_text( 'رنگ موفقیت', 'Success color' ),
+				'background' => rhi_text( 'پس‌زمینه فاکتور', 'Invoice background' ),
+				'surface'    => rhi_text( 'رنگ کارت‌ها', 'Card color' ),
+				'text'       => rhi_text( 'رنگ متن اصلی', 'Primary text color' ),
+				'muted'      => rhi_text( 'رنگ متن ثانویه', 'Secondary text color' ),
+				'border'     => rhi_text( 'رنگ خطوط و کادرها', 'Border color' ),
 			);
 			?>
 			<div class="wrap">
-				<h1>تنظیمات فاکتور سفارش</h1>
-				<p>این تنظیمات عمومی هستند و افزونه نام و لوگوی هر سایت را به‌صورت خودکار از همان سایت می‌خواند.</p>
+				<h1><?php echo esc_html( rhi_text( 'تنظیمات فاکتور سفارش', 'Order Invoice Settings' ) ); ?></h1>
+				<p><?php echo esc_html( rhi_text( 'این تنظیمات عمومی هستند و افزونه نام و لوگوی هر سایت را به‌صورت خودکار از همان سایت می‌خواند.', 'These settings are reusable; the plugin reads each site name and logo automatically.' ) ); ?></p>
 
 				<form method="post" action="options.php">
 					<?php settings_fields( 'rhi_woo_invoice_group' ); ?>
 
-					<h2>رنگ‌بندی</h2>
+					<h2><?php echo esc_html( rhi_text( 'رنگ‌بندی', 'Colors' ) ); ?></h2>
 					<table class="form-table" role="presentation">
 						<tbody>
 						<?php foreach ( $colors as $key => $label ) : ?>
@@ -238,11 +244,11 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 						</tbody>
 					</table>
 
-					<h2>متن‌ها</h2>
+					<h2><?php echo esc_html( rhi_text( 'متن‌ها', 'Text' ) ); ?></h2>
 					<table class="form-table" role="presentation">
 						<tbody>
 							<tr>
-								<th scope="row"><label for="rhi-success-title">عنوان موفقیت سفارش</label></th>
+								<th scope="row"><label for="rhi-success-title"><?php echo esc_html( rhi_text( 'عنوان موفقیت سفارش', 'Order success title' ) ); ?></label></th>
 								<td>
 									<input
 										type="text"
@@ -254,7 +260,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 								</td>
 							</tr>
 							<tr>
-								<th scope="row"><label for="rhi-invoice-title">عنوان فاکتور</label></th>
+								<th scope="row"><label for="rhi-invoice-title"><?php echo esc_html( rhi_text( 'عنوان فاکتور', 'Invoice title' ) ); ?></label></th>
 								<td>
 									<input
 										type="text"
@@ -266,7 +272,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 								</td>
 							</tr>
 							<tr>
-								<th scope="row"><label for="rhi-footer-note">متن پایین فاکتور</label></th>
+								<th scope="row"><label for="rhi-footer-note"><?php echo esc_html( rhi_text( 'متن پایین فاکتور', 'Invoice footer text' ) ); ?></label></th>
 								<td>
 									<input
 										type="text"
@@ -280,7 +286,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 						</tbody>
 					</table>
 
-					<?php submit_button( 'ذخیره تنظیمات' ); ?>
+					<?php submit_button( rhi_text( 'ذخیره تنظیمات', 'Save settings' ) ); ?>
 				</form>
 			</div>
 			<?php
@@ -1157,11 +1163,11 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 			if ( $is_order_pay && ! $is_paid ) {
 				$top_title = $order->has_status( 'failed' )
-					? 'پرداخت ناموفق بود؛ امکان پرداخت مجدد وجود دارد'
-					: 'سفارش ثبت شد؛ در انتظار تکمیل پرداخت';
+					? rhi_text( 'پرداخت ناموفق بود؛ امکان پرداخت مجدد وجود دارد', 'Payment failed; you can try again' )
+					: rhi_text( 'سفارش ثبت شد؛ در انتظار تکمیل پرداخت', 'Order placed; awaiting payment' );
 
 				$top_text = sprintf(
-					'وضعیت فعلی سفارش «%s» است. اقلام سفارش را بررسی کنید و ادامه پرداخت را از همین صفحه انجام دهید.',
+					rhi_text( 'وضعیت فعلی سفارش «%s» است. اقلام سفارش را بررسی کنید و ادامه پرداخت را از همین صفحه انجام دهید.', 'The current order status is “%s”. Review the items and continue payment from this page.' ),
 					wc_get_order_status_name( $order->get_status() )
 				);
 
@@ -1181,7 +1187,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 			);
 
 			if ( '' === $customer_name ) {
-				$customer_name = 'مشتری';
+				$customer_name = rhi_text( 'مشتری', 'Customer' );
 			}
 
 			$order_date = $order->get_date_created()
@@ -1192,7 +1198,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 			if ( ! $payment_title ) {
 				$payment_title = (float) $order->get_total() <= 0
-					? 'بدون نیاز به پرداخت'
+					? rhi_text( 'بدون نیاز به پرداخت', 'No payment required' )
 					: '—';
 			}
 
@@ -1229,7 +1235,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 								} else {
 									echo esc_html(
 										sprintf(
-											'%s عزیز، جزئیات سفارش شما در فاکتور زیر ثبت شده است.',
+											rhi_text( '%s عزیز، جزئیات سفارش شما در فاکتور زیر ثبت شده است.', 'Dear %s, your order details are shown in the invoice below.' ),
 											$customer_name
 										)
 									);
@@ -1246,27 +1252,27 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 				<div class="rhi-meta">
 					<div class="rhi-meta-card">
-						<span class="rhi-meta-label">شماره سفارش</span>
+						<span class="rhi-meta-label"><?php echo esc_html( rhi_text( 'شماره سفارش', 'Order number' ) ); ?></span>
 						<span class="rhi-meta-value">#<?php echo esc_html( $order->get_order_number() ); ?></span>
 					</div>
 
 					<div class="rhi-meta-card">
-						<span class="rhi-meta-label">تاریخ سفارش</span>
+						<span class="rhi-meta-label"><?php echo esc_html( rhi_text( 'تاریخ سفارش', 'Order date' ) ); ?></span>
 						<span class="rhi-meta-value"><?php echo esc_html( $order_date ); ?></span>
 					</div>
 
 					<div class="rhi-meta-card">
-						<span class="rhi-meta-label">وضعیت</span>
+						<span class="rhi-meta-label"><?php echo esc_html( rhi_text( 'وضعیت', 'Status' ) ); ?></span>
 						<span class="rhi-meta-value"><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></span>
 					</div>
 
 					<div class="rhi-meta-card">
-						<span class="rhi-meta-label">روش پرداخت</span>
+						<span class="rhi-meta-label"><?php echo esc_html( rhi_text( 'روش پرداخت', 'Payment method' ) ); ?></span>
 						<span class="rhi-meta-value"><?php echo esc_html( $payment_title ); ?></span>
 					</div>
 
 					<div class="rhi-meta-card">
-						<span class="rhi-meta-label">مبلغ نهایی</span>
+						<span class="rhi-meta-label"><?php echo esc_html( rhi_text( 'مبلغ نهایی', 'Total' ) ); ?></span>
 						<span class="rhi-meta-value"><?php echo wp_kses_post( $order->get_formatted_order_total() ); ?></span>
 					</div>
 				</div>
@@ -1279,14 +1285,14 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 							type="button"
 							class="rhi-print-btn"
 							onclick="rhiPrintInvoice();"
-							aria-label="چاپ فاکتور"
+							aria-label="<?php echo esc_attr( rhi_text( 'چاپ فاکتور', 'Print invoice' ) ); ?>"
 						>
 							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 								<path d="M6 9V3H18V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 								<path d="M6 18H4C2.9 18 2 17.1 2 16V11C2 9.9 2.9 9 4 9H20C21.1 9 22 9.9 22 11V16C22 17.1 21.1 18 20 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 								<path d="M6 14H18V21H6V14Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
 							</svg>
-							<span>چاپ فاکتور</span>
+							<span><?php echo esc_html( rhi_text( 'چاپ فاکتور', 'Print invoice' ) ); ?></span>
 						</button>
 					</div>
 
@@ -1294,10 +1300,10 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 						<table class="rhi-table">
 							<thead>
 								<tr>
-									<th scope="col">ردیف</th>
-									<th scope="col">شرح</th>
-									<th scope="col">تعداد</th>
-									<th scope="col">مبلغ</th>
+									<th scope="col"><?php echo esc_html( rhi_text( 'ردیف', 'No.' ) ); ?></th>
+									<th scope="col"><?php echo esc_html( rhi_text( 'شرح', 'Description' ) ); ?></th>
+									<th scope="col"><?php echo esc_html( rhi_text( 'تعداد', 'Quantity' ) ); ?></th>
+									<th scope="col"><?php echo esc_html( rhi_text( 'مبلغ', 'Amount' ) ); ?></th>
 								</tr>
 							</thead>
 
@@ -1317,7 +1323,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 											<?php if ( $sku ) : ?>
 												<span class="rhi-product-meta">
-													کد محصول: <?php echo esc_html( $sku ); ?>
+													<?php echo esc_html( rhi_text( 'کد محصول:', 'SKU:' ) ); ?> <?php echo esc_html( $sku ); ?>
 												</span>
 											<?php endif; ?>
 
@@ -1355,7 +1361,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 								<?php if ( (float) $order->get_discount_total() > 0 ) : ?>
 									<tr class="rhi-finance-row">
 										<td colspan="3">
-											<span class="rhi-finance-label">تخفیف</span>
+										<span class="rhi-finance-label"><?php echo esc_html( rhi_text( 'تخفیف', 'Discount' ) ); ?></span>
 										</td>
 										<td>
 											-<?php
@@ -1391,7 +1397,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 								<?php if ( (float) $order->get_total_tax() > 0 ) : ?>
 									<tr class="rhi-finance-row">
 										<td colspan="3">
-											<span class="rhi-finance-label">مالیات</span>
+										<span class="rhi-finance-label"><?php echo esc_html( rhi_text( 'مالیات', 'Tax' ) ); ?></span>
 										</td>
 										<td>
 											<?php
@@ -1410,7 +1416,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 									<tr class="rhi-shipping-row">
 										<td colspan="3">
 											<span class="rhi-shipping-label">
-												حمل و نقل
+												<?php echo esc_html( rhi_text( 'حمل و نقل', 'Shipping' ) ); ?>
 
 												<?php if ( $order->get_shipping_method() ) : ?>
 													<span class="rhi-shipping-method">
@@ -1430,7 +1436,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 													)
 												);
 											} else {
-												echo esc_html( 'رایگان' );
+												echo esc_html( rhi_text( 'رایگان', 'Free' ) );
 											}
 											?>
 										</td>
@@ -1439,7 +1445,7 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 								<tr class="rhi-total-row">
 									<td colspan="3">
-										<span class="rhi-total-label">جمع نهایی</span>
+									<span class="rhi-total-label"><?php echo esc_html( rhi_text( 'جمع نهایی', 'Total' ) ); ?></span>
 									</td>
 									<td>
 										<span class="rhi-total-price">
@@ -1454,14 +1460,14 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 
 				<div class="rhi-addresses">
 					<div class="rhi-address-card">
-						<h3 class="rhi-address-title">اطلاعات صورتحساب</h3>
+						<h3 class="rhi-address-title"><?php echo esc_html( rhi_text( 'اطلاعات صورتحساب', 'Billing information' ) ); ?></h3>
 
 						<div class="rhi-address-content">
 							<address>
 								<?php
 								echo $billing_address
 									? wp_kses_post( $billing_address )
-									: esc_html( 'آدرسی ثبت نشده است.' );
+									: esc_html( rhi_text( 'آدرسی ثبت نشده است.', 'No address was recorded.' ) );
 								?>
 							</address>
 
@@ -1469,14 +1475,14 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 								<div class="rhi-address-extra">
 									<?php if ( $order->get_billing_phone() ) : ?>
 										<div>
-											تلفن:
+											<?php echo esc_html( rhi_text( 'تلفن:', 'Phone:' ) ); ?>
 											<strong><?php echo esc_html( $order->get_billing_phone() ); ?></strong>
 										</div>
 									<?php endif; ?>
 
 									<?php if ( $order->get_billing_email() ) : ?>
 										<div>
-											ایمیل:
+											<?php echo esc_html( rhi_text( 'ایمیل:', 'Email:' ) ); ?>
 											<strong><?php echo esc_html( $order->get_billing_email() ); ?></strong>
 										</div>
 									<?php endif; ?>
@@ -1486,14 +1492,14 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 					</div>
 
 					<div class="rhi-address-card">
-						<h3 class="rhi-address-title">آدرس ارسال</h3>
+						<h3 class="rhi-address-title"><?php echo esc_html( rhi_text( 'آدرس ارسال', 'Shipping address' ) ); ?></h3>
 
 						<div class="rhi-address-content">
 							<address>
 								<?php
 								echo $shipping_address
 									? wp_kses_post( $shipping_address )
-									: esc_html( 'آدرس ارسالی ثبت نشده است.' );
+									: esc_html( rhi_text( 'آدرس ارسالی ثبت نشده است.', 'No shipping address was recorded.' ) );
 								?>
 							</address>
 						</div>
@@ -1512,15 +1518,15 @@ if ( ! class_exists( 'RHI_Woo_Invoice_MU' ) ) {
 							class="rhi-button rhi-button-primary"
 							onclick="rhiPrintInvoice();"
 						>
-							چاپ فاکتور
+							<?php echo esc_html( rhi_text( 'چاپ فاکتور', 'Print invoice' ) ); ?>
 						</button>
 
 						<a href="<?php echo esc_url( $account_url ); ?>" class="rhi-button">
-							حساب کاربری
+							<?php echo esc_html( rhi_text( 'حساب کاربری', 'My account' ) ); ?>
 						</a>
 
 						<a href="<?php echo esc_url( $shop_url ); ?>" class="rhi-button">
-							بازگشت به فروشگاه
+							<?php echo esc_html( rhi_text( 'بازگشت به فروشگاه', 'Back to shop' ) ); ?>
 						</a>
 					</div>
 				</div>

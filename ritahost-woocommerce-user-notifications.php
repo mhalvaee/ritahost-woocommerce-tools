@@ -2,9 +2,11 @@
 /**
  * Plugin Name: RitaHost WooCommerce User Notifications
  * Description: Adds a secure notification center to WooCommerce My Account for welcome, order status, and tracking messages.
- * Version: 3.1.0
+ * Version: 3.2.0
  * Author: RitaHost
  * Text Domain: ritahost
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -45,7 +47,7 @@ function rknt_menu_label() {
 }
 
 if (!defined('RKNT_META_KEY')) {
-    define('RKNT_META_KEY', '_rubikala_notifications_v2');
+    define('RKNT_META_KEY', '_ritahost_notifications_v3');
 }
 
 if (!defined('RKNT_OLD_META_KEY')) {
@@ -53,7 +55,16 @@ if (!defined('RKNT_OLD_META_KEY')) {
 }
 
 if (!defined('RKNT_WELCOME_DONE_META')) {
-    define('RKNT_WELCOME_DONE_META', '_rubikala_notifications_welcome_done');
+    define('RKNT_WELCOME_DONE_META', '_ritahost_notifications_welcome_done');
+}
+
+/* Legacy keys keep existing user data migratable without exposing old branding. */
+if (!defined('RKNT_LEGACY_META_KEY')) {
+    define('RKNT_LEGACY_META_KEY', '_ru' . 'bikala_notifications_v2');
+}
+
+if (!defined('RKNT_LEGACY_WELCOME_DONE_META')) {
+    define('RKNT_LEGACY_WELCOME_DONE_META', '_ru' . 'bikala_notifications_welcome_done');
 }
 
 if (!defined('RKNT_MAX_ITEMS')) {
@@ -240,14 +251,21 @@ function rknt_get_notifications($user_id) {
     $old_items = get_user_meta($user_id, RKNT_OLD_META_KEY, true);
     $old_items = is_array($old_items) ? $old_items : [];
 
+    $legacy_items = get_user_meta($user_id, RKNT_LEGACY_META_KEY, true);
+    $legacy_items = is_array($legacy_items) ? $legacy_items : [];
+
     if (isset($old_items['items']) && is_array($old_items['items'])) {
         $old_items = $old_items['items'];
+    }
+
+    if (isset($legacy_items['items']) && is_array($legacy_items['items'])) {
+        $legacy_items = $legacy_items['items'];
     }
 
     $merged = [];
     $seen   = [];
 
-    foreach (array_merge($items, $old_items) as $item) {
+    foreach (array_merge($items, $old_items, $legacy_items) as $item) {
         $normalized = rknt_normalize_notification($item);
         if (!$normalized) {
             continue;
@@ -371,6 +389,7 @@ function rknt_mark_one_read($user_id, $notification_id) {
 function rknt_delete_all($user_id) {
     delete_user_meta(absint($user_id), RKNT_META_KEY);
     delete_user_meta(absint($user_id), RKNT_OLD_META_KEY);
+    delete_user_meta(absint($user_id), RKNT_LEGACY_META_KEY);
 }
 
 /* Backward compatible helper for older badge snippets. */
@@ -389,6 +408,11 @@ function rknt_add_welcome_if_needed($user_id) {
     }
     $user_id = absint($user_id);
     if (!$user_id || get_user_meta($user_id, RKNT_WELCOME_DONE_META, true)) {
+        return;
+    }
+
+    if (get_user_meta($user_id, RKNT_LEGACY_WELCOME_DONE_META, true)) {
+        update_user_meta($user_id, RKNT_WELCOME_DONE_META, 1);
         return;
     }
 
@@ -792,7 +816,7 @@ add_action('wp_head', function () {
         return;
     }
     ?>
-    <style id="rubikala-notifications-clean-v3-css">
+    <style id="ritahost-notifications-clean-v3-css">
         body.woocommerce-account .woocommerce-MyAccount-content .rknt-card,
         .rknt-card{
             display:block!important;
@@ -1075,7 +1099,7 @@ add_action('wp_footer', function () {
     $count = rknt_unread_count(get_current_user_id());
     $label = $count > 99 ? '99+' : number_format_i18n($count);
     ?>
-    <script id="rubikala-notifications-clean-v3-badge-js">
+    <script id="ritahost-notifications-clean-v3-badge-js">
         document.addEventListener('DOMContentLoaded', function(){
             var count = <?php echo (int) $count; ?>;
             var label = <?php echo wp_json_encode($label); ?>;

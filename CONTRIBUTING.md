@@ -11,4 +11,3 @@ Thank you for helping improve RitaHost WooCommerce Tools.
 5. Do not include credentials, customer data, generated archives, or site-specific secrets.
 
 For vulnerabilities, follow `SECURITY.md` instead of opening a public issue.
-
